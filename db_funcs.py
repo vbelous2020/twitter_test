@@ -68,23 +68,37 @@ def get_user_from_db(con):
         print(f"The error '{e}' occurred")
 
 
-def save_all_tweets(out_tweets, screen_name):
+def save_all_tweets(out_tweets, screen_name, mode):
     # csv
-    with open('%s_tweets.csv' % screen_name, 'w', encoding='utf-8') as f:
-        writer = csv.writer(f)
-        writer.writerow(["id", "created_at", "text", "media_url"])
-        writer.writerows(out_tweets)
-    # db TODO solve problem with media recording!!!
-    # cursor = con.cursor()
-    # try:
-    #     cursor.executemany(""" INSERT INTO tweets (pub_id, pub_date, pub_text, media_url)
-    #                     VALUES (%s, %s, %s, %s)""", out_tweets)
-    #     con.commit()
-    #     print("Query executed successfully")
-    # except Error as e:
-    #     print(f"The error '{e}' occurred")
+    if mode == 'Media':
+        with open('%s_tweets.csv' % screen_name, 'w', encoding='utf-8') as f:
+            writer = csv.writer(f)
+            writer.writerow(["id", "created_at", "text", "media_url"])
+            writer.writerows(out_tweets)
 
+        cursor = con.cursor()
+        try:
+            cursor.executemany(""" INSERT INTO tweets (pub_id, pub_date, pub_text, media_url, user_id)
+                                VALUES (%s, %s, %s, %s, %s)""", out_tweets)
+            con.commit()
+            print("Query executed successfully")
+        except Error as e:
+            print(f"The error '{e}' occurred")
 
+    elif mode == 'No media':
+        with open('%s_tweets_without_media.csv' % screen_name, 'w', encoding='utf-8') as f:
+            writer = csv.writer(f)
+            writer.writerow(["id", "created_at", "text", "media_url"])
+            writer.writerows(out_tweets)
+
+        cursor = con.cursor()
+        try:
+            cursor.executemany(""" INSERT INTO tweets (pub_id, pub_date, pub_text, user_id)
+                                    VALUES (%s, %s, %s, %s)""", out_tweets)
+            con.commit()
+            print("Query executed successfully")
+        except Error as e:
+            print(f"The error '{e}' occurred")
 
 
 def get_publ_from_db(con):
@@ -120,12 +134,11 @@ CREATE TABLE IF NOT EXISTS users (
 create_publications_table = """
 CREATE TABLE IF NOT EXISTS tweets (
   id INT AUTO_INCREMENT, 
-  pub_id INT NOT NULL, 
+  pub_id BIGINT NOT NULL, 
   pub_text TEXT NOT NULL, 
-  user_id INTEGER NOT NULL, 
+  user_id TEXT NOT NULL, 
   pub_date DATETIME,
-  media_url TEXT,
-  FOREIGN KEY fk_user_id (user_id) REFERENCES users(id), 
+  media_url TEXT, 
   PRIMARY KEY (id)
 ) ENGINE = InnoDB
 """
@@ -133,6 +146,6 @@ CREATE TABLE IF NOT EXISTS tweets (
 con = create_connection("localhost", "root", "firmamento10", "twitter_test")
 execute_query(con, create_users_table)
 execute_query(con, create_publications_table)
-
-# execute_query(con, "DROP TABLE publications")
 # execute_query(con, "DROP TABLE users")
+# execute_query(con, "DROP TABLE tweets")
+

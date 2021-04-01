@@ -39,32 +39,35 @@ def get_all_tweets(screen_name):
         oldest = all_tweets[-1].id - 1
         print("...%s tweets downloaded so far" % (len(all_tweets)))
     out_tweets = []
+    out_tweets_no_media = []
     for tweet in all_tweets:
         id_tweet = tweet.id_str
         date_tweet = tweet.created_at
         text_tweet = tweet.text
-        out_tweets.append([id_tweet, date_tweet, text_tweet])
+        user_id = tweet.user.name
         try:
             print(tweet.entities['media'][0]['media_url_https'])
-        except (NameError, KeyError):
-            pass
+        except KeyError:
+            out_tweets_no_media.append([id_tweet, date_tweet, text_tweet, user_id])
         else:
             media_url = tweet.entities['media'][0]['media_url_https']
-            out_tweets.append([media_url])
-    save_all_tweets(out_tweets, screen_name)
+            out_tweets.append([id_tweet, date_tweet, text_tweet, media_url, user_id])
+    save_all_tweets(out_tweets, screen_name, 'Media')
+    save_all_tweets(out_tweets_no_media, screen_name, 'No media')
 
 
 if __name__ == '__main__':
     list_of_users = ["AvakovArsen", "NatGeo", "disneyplus", "starwars", "IGN", "netflix", "Ukraine",
                      "APUkraine", "Warcraft", "Wowhead", "ChristieGolden"]
-    for user in list_of_users:
-        get_user(user, con)
-
-    get_user_from_db(con)
-    for user in list_of_users:
-        get_all_tweets(user)
-        time.sleep(5)
+    # for user in list_of_users:
+    #     get_user(user, con)
+    #
+    # get_user_from_db(con)
+    # for user in list_of_users:
+    #     get_all_tweets(user)
+    #     time.sleep(5)
     get_publ_from_db(con)
+
 
 # tweepy.Cursor(api.user_timeline, id=screen_name, max_id=oldest, tweet_mode='extended').items(200)
 # try:
