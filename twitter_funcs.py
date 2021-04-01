@@ -59,13 +59,13 @@ def get_all_tweets(screen_name):
 if __name__ == '__main__':
     list_of_users = ["AvakovArsen", "NatGeo", "disneyplus", "starwars", "IGN", "netflix", "Ukraine",
                      "APUkraine", "Warcraft", "Wowhead", "ChristieGolden"]
-    # for user in list_of_users:
-    #     get_user(user, con)
-    #
-    # get_user_from_db(con)
-    # for user in list_of_users:
-    #     get_all_tweets(user)
-    #     time.sleep(5)
+    for user in list_of_users:
+        get_user(user, con)
+
+    get_user_from_db(con)
+    for user in list_of_users:
+        get_all_tweets(user)
+        time.sleep(5)
     get_publ_from_db(con)
 
 

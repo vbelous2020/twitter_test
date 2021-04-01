@@ -71,11 +71,10 @@ def get_user_from_db(con):
 def save_all_tweets(out_tweets, screen_name, mode):
     # csv
     if mode == 'Media':
-        with open('%s_tweets.csv' % screen_name, 'w', encoding='utf-8') as f:
-            writer = csv.writer(f)
-            writer.writerow(["id", "created_at", "text", "media_url"])
-            writer.writerows(out_tweets)
-
+        # with open('%s_tweets.csv' % screen_name, 'w', encoding='utf-8') as f:
+        #     writer = csv.writer(f)
+        #     writer.writerow(["id", "created_at", "text", "media_url"])
+        #     writer.writerows(out_tweets)
         cursor = con.cursor()
         try:
             cursor.executemany(""" INSERT INTO tweets (pub_id, pub_date, pub_text, media_url, user_id)
@@ -86,11 +85,10 @@ def save_all_tweets(out_tweets, screen_name, mode):
             print(f"The error '{e}' occurred")
 
     elif mode == 'No media':
-        with open('%s_tweets_without_media.csv' % screen_name, 'w', encoding='utf-8') as f:
-            writer = csv.writer(f)
-            writer.writerow(["id", "created_at", "text", "media_url"])
-            writer.writerows(out_tweets)
-
+        # with open('%s_tweets_without_media.csv' % screen_name, 'w', encoding='utf-8') as f:
+        #     writer = csv.writer(f)
+        #     writer.writerow(["id", "created_at", "text", "media_url"])
+        #     writer.writerows(out_tweets)
         cursor = con.cursor()
         try:
             cursor.executemany(""" INSERT INTO tweets (pub_id, pub_date, pub_text, user_id)
