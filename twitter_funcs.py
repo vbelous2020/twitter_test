@@ -84,4 +84,3 @@ if __name__ == '__main__':
 #         out_tweets.append([media_url])
 # except (AttributeError, KeyError, TypeError):
 #     pass
-
