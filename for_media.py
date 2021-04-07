@@ -71,7 +71,7 @@ class TweetParser(object):
             # logging.info("Extended entities not present in tweet")
             return []
 
-    def fetch(self, account, tweet_mode='extended', limit=500):
+    def fetch(self, account, tweet_mode='extended', limit=3250):
         # 3250 tweets is max for parsing from each user
         dir_name = account
         api = self.api
