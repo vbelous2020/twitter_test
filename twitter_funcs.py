@@ -1,8 +1,9 @@
 import tweepy
 from twitter_secret_key import consumer_key, consumer_secret, access_key, access_secret
-from db_funcs import con, get_user_from_db, get_publ_from_db, save_all_tweets
+from db_funcs import con, get_user_from_db, get_publ_from_db, save_all_to_db
 from mysql.connector import Error
 import time
+
 
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_key, access_secret)
@@ -52,8 +53,8 @@ def get_all_tweets(screen_name):
         else:
             media_url = tweet.entities['media'][0]['media_url_https']
             out_tweets.append([id_tweet, date_tweet, text_tweet, media_url, user_id])
-    save_all_tweets(out_tweets, screen_name, 'Media')
-    save_all_tweets(out_tweets_no_media, screen_name, 'No media')
+    save_all_to_db(out_tweets)
+    save_all_to_db(out_tweets_no_media)
 
 
 if __name__ == '__main__':
