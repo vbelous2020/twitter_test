@@ -1,0 +1,23 @@
+# TODO Plan:
+# 1. Create def for main and make one point of start in this main.py file       DONE
+# 2. Import all dependency                                                      DONE
+# 3. End with media and data in new way(as TweetParser class)                   DONE
+# 4. Save data into db(from TweetParser class)                                  DONE
+# 5. Remove old way                                                             DONE
+# 6. Remove or repair download funcs
+# 7. Make list of 30-40 people to search
+# 8. Calculate time for listening 30-40 twitter users
+# 9. Report
+
+
+# from TweetParser(so far useless) TODO or REMOVE
+# import wget
+# def download(self, urls, file_type, destination):
+#     self._download_from_urls("MAIN", list(urls), file_type, destination)
+#
+# def _download_from_urls(self, name, batch, file_type, dest_dir):
+#     for url in batch:
+#         logging.info("Thread: {} downloading {}".format(name, url))
+#         media_file = url.split("/")[-1]
+#         path = os.path.join(dest_dir, media_file)
+#         wget.download(url, path)

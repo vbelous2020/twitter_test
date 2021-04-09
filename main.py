@@ -1,10 +1,13 @@
-# TODO:
-# 1. Create def for main and make one point of start in this main.py file
-# 2. Import all dependency
-# 3. End with media and data in new way(as TweetParser class)                   DONE
-# 4. Save data into db(from TweetParser class)                                  DONE
-# 5. Remove old way
-# 6. Remove or repair download funcs
-# 7. Make list of 30-40 people to search
-# 8. Calculate time for listening 30-40 twitter users
-# 9. Report
+from db_funcs import get_user_from_db, get_publ_from_db, con
+from parser_func import TweetParser
+
+
+if __name__ == '__main__':
+    users = ["AvakovArsen", "NatGeo", "disneyplus", "starwars", "IGN", "netflix", "Ukraine", "APUkraine", "Warcraft",
+             "Wowhead", "ChristieGolden"]
+    users2 = ["AvakovArsen"]
+    parser = TweetParser()
+    for user in users2:
+        parser.fetch(user)
+    # get_user_from_db(con)
+    # get_publ_from_db(con)

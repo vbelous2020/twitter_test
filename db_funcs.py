@@ -1,9 +1,8 @@
 import mysql.connector
 import pandas as pd
 from mysql.connector import Error
+from keys_and_details import host_name, user_name, user_password, db_name
 
-# import csv
-# DATABASE twitter_test
 
 create_users_table = """
 CREATE TABLE IF NOT EXISTS users (
@@ -30,19 +29,19 @@ CREATE TABLE IF NOT EXISTS tweets (
 """
 
 
-def create_connection(host_name, user_name, user_password, db_name):
-    con = None
+def create_connection(host, user, password, db):
+    connection = None
     try:
-        con = mysql.connector.connect(
-            host=host_name,
-            user=user_name,
-            passwd=user_password,
-            database=db_name
+        connection = mysql.connector.connect(
+            host=host,
+            user=user,
+            passwd=password,
+            database=db
         )
         print("Connection to MySQL DB successful")
     except Error as e:
         print(f"The error '{e}' occurred")
-    return con
+    return connection
 
 
 def create_database(connection, query):
@@ -75,7 +74,7 @@ def execute_read_query(connection, query):
         print(f"The error '{e}' occurred")
 
 
-def save_user_to_db(user_data):
+def save_user(user_data):
     cursor = con.cursor()
     info = """INSERT INTO users (name, followers, geo, registration_date) VALUES (%s, %s, %s, %s)"""
     try:
@@ -85,7 +84,7 @@ def save_user_to_db(user_data):
         print(f"The error '{e}' occurred")
 
 
-def save_all_to_db(account):
+def save_tweet_data(account):
     cursor = con.cursor()
     data = pd.read_csv(f'/Users/vladimirbelous/Desktop/Учеба/Work/twitter_test/{account}_tweets.csv')
     df = pd.DataFrame(data, columns=['user', 'id', 'created_at', 'text', 'location', 'media_urls'])
@@ -137,12 +136,8 @@ def get_publ_from_db(connection):
         print(f"The error '{e}' occurred")
 
 
-con = create_connection("localhost", "root", "firmamento10", "twitter_test")
-execute_query(con, create_users_table)
-execute_query(con, create_publications_table)
+con = create_connection(host_name, user_name, user_password, db_name)
+# execute_query(con, create_users_table)
+# execute_query(con, create_publications_table)
 # execute_query(con, "DROP TABLE users")
 # execute_query(con, "DROP TABLE tweets")
-
-get_user_from_db(con)
-get_publ_from_db(con)
-
