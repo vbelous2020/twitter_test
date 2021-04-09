@@ -59,7 +59,7 @@ class TweetParser(object):
         self.user_data = user_data
         save_user(user_data)
 
-    def fetch(self, account, tweet_mode='extended', limit=10):
+    def fetch(self, account, tweet_mode='extended', limit=3250):
         api = self.api
         self.fetch_user(account)
         count = 1
