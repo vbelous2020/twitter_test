@@ -3,12 +3,12 @@ import shutil
 import logging
 import tweepy
 import csv
+import pandas as pd
 from tweepy import OAuthHandler
 from os.path import expanduser
 from twitter_secret_key import consumer_key, consumer_secret
 from db_funcs import save_all_to_db, save_user_to_db
 home = expanduser("~")
-
 
 class TweetParser(object):
     def __init__(self):
@@ -32,9 +32,10 @@ class TweetParser(object):
         save_user_to_db(user_data)
 
     def save_data(self, video_urls, image_urls, out_tweets, account):
-        self.video_urls = list(video_urls)
-        self.image_urls = list(image_urls)
+        self.video_urls = video_urls
+        self.image_urls = image_urls
         print("Saving all data from tweets. \n")
+        # saving media urls to txt
         logging.info("Saving image and video links to files.")
         with open(os.path.join(account, "images.txt"), "w") as f:
             for url in image_urls:
@@ -42,13 +43,13 @@ class TweetParser(object):
         with open(os.path.join(account, "videos.txt"), "w") as f:
             for url in video_urls:
                 f.write(url + "\n")
-        # save to DB
-        save_all_to_db(out_tweets)
         # save to CSV
         with open('%s_tweets.csv' % account, 'w', encoding='utf-8') as f:
             writer = csv.writer(f)
-            writer.writerow(["user", "id", "created_at", "text", "location", "media_url"])
+            writer.writerow(["user", "id", "created_at", "text", "location", "media_urls"])
             writer.writerows(out_tweets)
+        # save to DB from CSV
+        save_all_to_db(account)
 
     def process_tweet_media(self, tweet):
         try:
@@ -69,7 +70,7 @@ class TweetParser(object):
             return rv
         except AttributeError:
             # logging.info("Extended entities not present in tweet")
-            return []
+            return ["No media"]
 
     def fetch(self, account, tweet_mode='extended', limit=3250):
         # 3250 tweets is max for parsing from each user
@@ -77,8 +78,8 @@ class TweetParser(object):
         api = self.api
         self.fetch_user(account)
         epoch = 1
-        video_urls = set()
-        image_urls = set()
+        video_urls = list()
+        image_urls = list()
         if os.path.exists(dir_name):
             shutil.rmtree(dir_name)
         os.mkdir(dir_name)
@@ -88,16 +89,16 @@ class TweetParser(object):
             text_tweet = tweet.full_text
             user_id = tweet.user.name
             tweet_location = tweet.user.location
-            print("Tweets: {}".format(epoch))
+            print('Tweets: {}'.format(epoch))
             epoch += 1
-            rv = self.process_tweet_media(tweet)
-            for r in rv:
-                if r.endswith("mp4"):
-                    video_urls.add(r)
+            media_urls = self.process_tweet_media(tweet)
+            for url in media_urls:
+                if url.endswith('mp4'):
+                    video_urls.append(url)
                 else:
-                    image_urls.add(r)
-            self.out_tweets.append([user_id, id_tweet, date_tweet, text_tweet, tweet_location, rv])
-            # save_all_to_db(self.out_tweets)
+                    image_urls.append(url)
+            out_tweets = ([user_id, id_tweet, date_tweet, text_tweet, tweet_location, media_urls])
+            self.out_tweets.append(out_tweets)
         self.save_data(video_urls, image_urls, self.out_tweets, account)
 
 

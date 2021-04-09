@@ -1,5 +1,5 @@
-import json
 import mysql.connector
+import pandas as pd
 from mysql.connector import Error
 
 # import csv
@@ -81,19 +81,20 @@ def save_user_to_db(user_data):
     try:
         cursor.execute(info, user_data)
         con.commit()
-        print("Query executed successfully")
     except Error as e:
         print(f"The error '{e}' occurred")
 
 
-def save_all_to_db(out_tweets):
+def save_all_to_db(account):
     cursor = con.cursor()
-    info = """ INSERT INTO tweets (user_id, pub_id, pub_date, pub_text, pub_location, media_url)
-                                VALUES (%s, %s, %s, %s, %s, %s)"""
+    data = pd.read_csv(f'/Users/vladimirbelous/Desktop/Учеба/Work/twitter_test/{account}_tweets.csv')
+    df = pd.DataFrame(data, columns=['user', 'id', 'created_at', 'text', 'location', 'media_urls'])
     try:
-        cursor.executemany(info, out_tweets)
+        for row in df.itertuples():
+            cursor.execute("""INSERT INTO tweets (user_id, pub_id, pub_date, pub_text, pub_location, media_url)
+                              VALUES (%s, %s, %s, %s, %s, %s)""",
+                           (row.user, row.id, row.created_at, row.text, row.location, row.media_urls))
         con.commit()
-        print("Query executed successfully")
     except Error as e:
         print(f"The error '{e}' occurred")
 
@@ -125,12 +126,13 @@ def get_publ_from_db(connection):
         print("Total number of rows in table: ", cursor.rowcount)
         print("Printing each row: \n")
         for row in records:
-            print("User id: ", row[0], )
-            print("Tweet id: ", row[1])
-            print("Tweet date: ", row[2])
-            print("Tweet Text: ", row[3])
-            print("Location: ", row[4])
-            print("Media url: ", row[5], "\n")
+            print("Record #", row[0])
+            print("User id: ", row[1])
+            print("Tweet id: ", row[2])
+            print("Tweet date: ", row[3])
+            print("Tweet Text: ", row[4])
+            print("Location: ", row[5])
+            print("Media url: ", row[6], "\n")
     except Error as e:
         print(f"The error '{e}' occurred")
 
@@ -141,4 +143,6 @@ execute_query(con, create_publications_table)
 # execute_query(con, "DROP TABLE users")
 # execute_query(con, "DROP TABLE tweets")
 
-# get_user_from_db(con)
+get_user_from_db(con)
+get_publ_from_db(con)
+
