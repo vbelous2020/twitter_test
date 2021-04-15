@@ -1,8 +1,8 @@
 import mysql.connector
 import pandas as pd
+import requests
 from mysql.connector import Error
 from keys_and_details import host_name, user_name, user_password, db_name
-
 
 create_users_table = """
 CREATE TABLE IF NOT EXISTS users (
@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS tweets (
   pub_text TEXT NOT NULL,
   pub_location TEXT, 
   media_url TEXT,
+  tweet_status TEXT,
   PRIMARY KEY (id)
 ) ENGINE = InnoDB
 """
@@ -87,12 +88,13 @@ def save_user(user_data):
 def save_tweet_data(account):
     cursor = con.cursor()
     data = pd.read_csv(f'/Users/vladimirbelous/Desktop/Учеба/Work/twitter_test/{account}_tweets.csv')
-    df = pd.DataFrame(data, columns=['user', 'id', 'created_at', 'text', 'location', 'media_urls'])
+    df = pd.DataFrame(data, columns=['user', 'id', 'created_at', 'text', 'location', 'media_urls', 'tweet_status'])
     try:
         for row in df.itertuples():
-            cursor.execute("""INSERT INTO tweets (user_id, pub_id, pub_date, pub_text, pub_location, media_url)
-                              VALUES (%s, %s, %s, %s, %s, %s)""",
-                           (row.user, row.id, row.created_at, row.text, row.location, row.media_urls))
+            cursor.execute("""INSERT INTO tweets (user_id, pub_id, pub_date, pub_text, 
+                              pub_location, media_url, tweet_status)
+                              VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+                           (row.user, row.id, row.created_at, row.text, row.location, row.media_urls, row.tweet_status))
         con.commit()
     except Error as e:
         print(f"The error '{e}' occurred")
@@ -116,8 +118,8 @@ def get_user_from_db(connection):
         print(f"The error '{e}' occurred")
 
 
-def get_publ_from_db(connection):
-    query = "select * from tweets"
+def get_publ_from_db(connection, sort='pub_date'):
+    query = "select * from tweets ORDER BY %s DESC" % sort
     cursor = connection.cursor()
     cursor.execute(query)
     try:
@@ -131,13 +133,61 @@ def get_publ_from_db(connection):
             print("Tweet date: ", row[3])
             print("Tweet Text: ", row[4])
             print("Location: ", row[5])
-            print("Media url: ", row[6], "\n")
+            print("Media url: ", row[6])
+            print("Tweet Status: ", row[7], "\n")
     except Error as e:
         print(f"The error '{e}' occurred")
 
 
+def get_tweet_id_from_db(connection):
+    query = "select * from tweets"
+    cursor = connection.cursor()
+    cursor.execute(query)
+    id_list = list()
+    try:
+        records = cursor.fetchall()
+        for row in records:
+            id_list = str(row[2])
+    except Error as e:
+        print(f"The error '{e}' occurred")
+    return id_list
+
+
+def get_user_last_tweet(connection):
+    query = "select * from tweets ORDER BY pub_date"
+    cursor = connection.cursor()
+    cursor.execute(query)
+    try:
+        records = cursor.fetchall()
+        for row in records:
+            tweet_id = str(row[2])
+            return tweet_id
+    except Error as e:
+        print(f"The error '{e}' occurred")
+
+
+def save_active_status(flag, tweet_id):
+    cursor = con.cursor()
+    info = """UPDATE Tweets SET Deleted=%s WHERE Tweet_Id=%s"""
+    try:
+        cursor.execute(info, (flag, tweet_id))
+        con.commit()
+    except Error as e:
+        print(f"The error '{e}' occurred")
+
+
+def check(account):
+    id_list = get_tweet_id_from_db(con)
+    for tweet_id in id_list:
+        tweet_url = f"http://twitter.com/{account}/status/{tweet_id}"
+        r = requests.get(tweet_url)
+        if r.status_code != 200:
+            flag = 'Deleted'
+            save_active_status(flag, tweet_id)
+
+
 con = create_connection(host_name, user_name, user_password, db_name)
-# execute_query(con, create_users_table)
-# execute_query(con, create_publications_table)
+execute_query(con, create_users_table)
+execute_query(con, create_publications_table)
 # execute_query(con, "DROP TABLE users")
 # execute_query(con, "DROP TABLE tweets")

@@ -4,10 +4,8 @@
 # 3. End with media and data in new way(as TweetParser class)                   DONE
 # 4. Save data into db(from TweetParser class)                                  DONE
 # 5. Remove old way                                                             DONE
-# 6. Remove or repair download funcs
-# 7. Make list of 30-40 people to search
-# 8. Calculate time for listening 30-40 twitter users
-# 9. Report
+# 6. New tweets check                                                           DONE
+# 7. Remove or repair download funcs
 
 
 # from TweetParser(so far useless) TODO or REMOVE
