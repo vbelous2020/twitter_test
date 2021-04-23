@@ -1,14 +1,6 @@
-# TODO Plan:
-# 1. Create def for main and make one point of start in this main.py file       DONE
-# 2. Import all dependency                                                      DONE
-# 3. End with media and data in new way(as TweetParser class)                   DONE
-# 4. Save data into db(from TweetParser class)                                  DONE
-# 5. Remove old way                                                             DONE
-# 6. New tweets check                                                           DONE
-# 7. Remove or repair download funcs
+# import requests
 
-
-# from TweetParser(so far useless) TODO or REMOVE
+# from TweetParser(so far useless)
 # import wget
 # def download(self, urls, file_type, destination):
 #     self._download_from_urls("MAIN", list(urls), file_type, destination)
@@ -19,3 +11,26 @@
 #         media_file = url.split("/")[-1]
 #         path = os.path.join(dest_dir, media_file)
 #         wget.download(url, path)
+
+
+# def check(account):
+#     id_list = get_tweet_id_from_db(con)
+#     for tweet_id in id_list:
+#         tweet_url = f"http://twitter.com/{account}/status/{tweet_id}"
+#         r = requests.get(tweet_url)
+#         if r.status_code != 200:
+#             flag = 'Deleted'
+#             save_active_status(flag, tweet_id)
+
+# def get_tweet_id_from_db(connection):
+#     query = "select * from tweets"
+#     cursor = connection.cursor()
+#     cursor.execute(query)
+#     id_list = list()
+#     try:
+#         records = cursor.fetchall()
+#         for row in records:
+#             id_list = str(row[2])
+#     except Error as e:
+#         print(f"The error '{e}' occurred")
+#     return id_list
